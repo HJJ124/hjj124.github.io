@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://example.com/2022/05/21/HW/</loc>
+    <loc>https://ihjj.cn/2022/05/21/CESM_1.1/</loc>
     
     <lastmod>2022-05-21</lastmod>
     
@@ -11,7 +11,7 @@
   </url>
   
   <url>
-    <loc>http://example.com/about/index.html</loc>
+    <loc>https://ihjj.cn/2022/05/21/first-post/</loc>
     
     <lastmod>2022-05-21</lastmod>
     
@@ -20,7 +20,16 @@
   </url>
   
   <url>
-    <loc>http://example.com/2022/05/21/hello-world/</loc>
+    <loc>https://ihjj.cn/about/index.html</loc>
+    
+    <lastmod>2022-05-21</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://ihjj.cn/2022/05/21/hello-world/</loc>
     
     <lastmod>2022-05-21</lastmod>
     
@@ -30,13 +39,41 @@
   
 
   <url>
-    <loc>http://example.com/</loc>
+    <loc>https://ihjj.cn/</loc>
     <lastmod>2022-05-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   
+  <url>
+    <loc>https://ihjj.cn/tags/Linux/</loc>
+    <lastmod>2022-05-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://ihjj.cn/tags/CESM/</loc>
+    <lastmod>2022-05-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://ihjj.cn/tags/%E6%A8%A1%E5%BC%8F%E7%A7%BB%E6%A4%8D-%E8%BF%90%E8%A1%8C/</loc>
+    <lastmod>2022-05-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
+  
+  <url>
+    <loc>https://ihjj.cn/categories/%E7%BC%96%E7%A8%8B/</loc>
+    <lastmod>2022-05-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
   
 </urlset>

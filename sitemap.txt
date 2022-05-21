@@ -1,4 +1,9 @@
-http://example.com/2022/05/21/HW/
-http://example.com/about/index.html
-http://example.com/2022/05/21/hello-world/
-http://example.com/
+https://ihjj.cn/2022/05/21/CESM_1.1/
+https://ihjj.cn/2022/05/21/first-post/
+https://ihjj.cn/about/index.html
+https://ihjj.cn/2022/05/21/hello-world/
+https://ihjj.cn/
+https://ihjj.cn/tags/Linux/
+https://ihjj.cn/tags/CESM/
+https://ihjj.cn/tags/%E6%A8%A1%E5%BC%8F%E7%A7%BB%E6%A4%8D-%E8%BF%90%E8%A1%8C/
+https://ihjj.cn/categories/%E7%BC%96%E7%A8%8B/
