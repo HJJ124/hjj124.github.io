@@ -1,7 +1,5 @@
 https://ihjj.cn/2022/05/21/CESM_1.1/
-https://ihjj.cn/2022/05/21/first-post/
 https://ihjj.cn/about/index.html
-https://ihjj.cn/2022/05/21/hello-world/
 https://ihjj.cn/
 https://ihjj.cn/tags/Linux/
 https://ihjj.cn/tags/CESM/
