@@ -501,8 +501,9 @@
                 <span class="abstract-title-text">Ubuntu 20.04下 netcdf库的安装</span>
             </a>
             <div class="abstract-content">
-                针对ifort或是gfortran编译器切换root用户对于ifort1234567source ...... intel64    # 来自intel官方安装说明 将ifort命令添加到环境变量中export NETCDF=/usr/local/netcdf-ifort   #--------------&amp;gt;所有库将被安装到这个路径中export CC=iccexport CXX=icpcexport FC=ifortexport F90=ifortexport F77=ifort
-对于gfortran12345export F77=gfortranexport FC=gf...
+                针对ifort或是gfortran编译器首先切换root用户
+环境变量设置对于ifort1234567source /opt/intel/oneapi/setvars.sh intel64    # 来自intel官方安装说明 将ifort命令添加到环境变量中export NETCDF=/usr/local/netcdf-ifort   #--------------&amp;gt;所有库将被安装到这个路径中export CC=iccexport CXX=icpcexport FC=ifortexport F90=ifortexport F77=ifort
+对于gfortran12345...
             </div>
             <!-- read more -->
             
