@@ -1,7 +1,5 @@
 https://ihjj.cn/2022/05/22/CESM_1.1/
 https://ihjj.cn/about/index.html
 https://ihjj.cn/
-https://ihjj.cn/tags/Linux/
-https://ihjj.cn/tags/CESM/
-https://ihjj.cn/tags/%E6%A8%A1%E5%BC%8F/
-https://ihjj.cn/categories/%E7%BC%96%E7%A8%8B/
+https://ihjj.cn/tags/Model/
+https://ihjj.cn/categories/Code/
