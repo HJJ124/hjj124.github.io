@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Junjie Huang">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Junjie Huang">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content=" Welcome">
+    <meta name="description" content="Dcoker是什么容器化技术 直接运行在操作系统上（宿主机内核中）没有虚拟硬件  内核级别虚拟化 轻便 每个容器间互相隔离 各有自己的文件系统 通过镜像生成容器所有docker镜像都是只读，在镜像启动时加载一个新的可写层至镜像层顶部，即为容器层。 Docker入门命令命令概览所有命令可在Docker命令官方文档中查询 12#一条通用原则docker cmd --help # 查看cmd支持的常用命">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 笔记">
+<meta property="og:url" content="https://ihjj.cn/2022/09/02/Docker/index.html">
+<meta property="og:site_name" content="Astro的踩坑记录">
+<meta property="og:description" content="Dcoker是什么容器化技术 直接运行在操作系统上（宿主机内核中）没有虚拟硬件  内核级别虚拟化 轻便 每个容器间互相隔离 各有自己的文件系统 通过镜像生成容器所有docker镜像都是只读，在镜像启动时加载一个新的可写层至镜像层顶部，即为容器层。 Docker入门命令命令概览所有命令可在Docker命令官方文档中查询 12#一条通用原则docker cmd --help # 查看cmd支持的常用命">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="evernotecid://949D5C7E-1BC1-4AD8-8C92-3BD2142FB3A7/appyinxiangcom/25983660/ENResource/p151">
+<meta property="og:image" content="evernotecid://949D5C7E-1BC1-4AD8-8C92-3BD2142FB3A7/appyinxiangcom/25983660/ENResource/p149">
+<meta property="article:published_time" content="2022-09-02T09:49:50.577Z">
+<meta property="article:modified_time" content="2022-09-02T09:49:50.577Z">
+<meta property="article:author" content="Junjie Huang">
+<meta property="article:tag" content="Software">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="evernotecid://949D5C7E-1BC1-4AD8-8C92-3BD2142FB3A7/appyinxiangcom/25983660/ENResource/p151">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>Docker 笔记 · Astro&#39;s 踩坑记录</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="Astro的踩坑记录" type="application/atom+xml">
+</head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Astro's 踩坑记录</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">Astro&#39;s 踩坑记录</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">Docker 笔记</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                Docker 笔记
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        
+        
+            
+        
+        
+        <span class="post-category" data-categories="Linux"">
+            <i class="fas fa-folder post-category-icon"></i>
+            <span class="post-category-text">
+                Linux
+            </span>
+        </span>
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Software">Software</a>
+    
+</div>
+
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">1.7k</span>阅读时长: <span class="post-count reading-time">6 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/09/02</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h2 id="Dcoker是什么"><a href="#Dcoker是什么" class="headerlink" title="Dcoker是什么"></a>Dcoker是什么</h2><h4 id="容器化技术-直接运行在操作系统上（宿主机内核中）没有虚拟硬件-内核级别虚拟化-轻便-每个容器间互相隔离-各有自己的文件系统-通过镜像生成容器"><a href="#容器化技术-直接运行在操作系统上（宿主机内核中）没有虚拟硬件-内核级别虚拟化-轻便-每个容器间互相隔离-各有自己的文件系统-通过镜像生成容器" class="headerlink" title="容器化技术 直接运行在操作系统上（宿主机内核中）没有虚拟硬件  内核级别虚拟化 轻便 每个容器间互相隔离 各有自己的文件系统 通过镜像生成容器"></a><strong>容器化技术 直接运行在操作系统上（宿主机内核中）没有虚拟硬件  内核级别虚拟化 轻便 每个容器间互相隔离 各有自己的文件系统 通过镜像生成容器</strong></h4><p>所有docker镜像都是只读，在镜像启动时加载一个新的可写层至镜像层顶部，即为容器层。<br><img src="evernotecid://949D5C7E-1BC1-4AD8-8C92-3BD2142FB3A7/appyinxiangcom/25983660/ENResource/p151" alt="8f136c933dba31d015eca1c9526d6457.jpeg"><br><img src="evernotecid://949D5C7E-1BC1-4AD8-8C92-3BD2142FB3A7/appyinxiangcom/25983660/ENResource/p149" alt="4e473c94c8e44c6ea223b214642cdb35.png"></p>
+<h2 id="Docker入门命令"><a href="#Docker入门命令" class="headerlink" title="Docker入门命令"></a>Docker入门命令</h2><h3 id="命令概览"><a href="#命令概览" class="headerlink" title="命令概览"></a>命令概览</h3><p>所有命令可在<a target="_blank" rel="noopener" href="https://docs.docker.com/engine/reference/run/">Docker命令官方文档</a>中查询</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#一条通用原则</span></span><br><span class="line">docker cmd --<span class="built_in">help</span> <span class="comment"># 查看cmd支持的常用命令 完整版在官方文档搜索 </span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">docker info         <span class="comment">#显示docker系统信息 包括镜像、容器数量</span></span><br><span class="line">docker search xxx   <span class="comment"># 查询镜像</span></span><br><span class="line">docker run 镜像<span class="built_in">id</span> [cmd]      <span class="comment"># 生成容器并运行命令</span></span><br><span class="line">docker ps          <span class="comment"># 查看所有容器</span></span><br><span class="line">docker images       <span class="comment"># 查看所有镜像</span></span><br><span class="line">docker top 容器<span class="built_in">id</span>       <span class="comment"># 查看容器内进程</span></span><br><span class="line">docker inspect 容器<span class="built_in">id</span>       <span class="comment"># 查看容器所有信息 包括容器内的默认环境...</span></span><br><span class="line">docker <span class="built_in">rm</span>  xxx     <span class="comment"># 删除容器</span></span><br><span class="line">docker rmi xxx     <span class="comment"># 删除镜像（i-&gt;images）</span></span><br><span class="line">docker start/restart/stop/kill 容器<span class="built_in">id</span>   <span class="comment">#开启/重启/结束/关闭 容器</span></span><br><span class="line">docker logs        <span class="comment">#查看log文件</span></span><br><span class="line">docker <span class="built_in">history</span> 镜像<span class="built_in">id</span>  <span class="comment">#查看镜像创建的历史及步骤</span></span><br><span class="line">docker stats <span class="comment">#查看所有容器的cpu占用等信息</span></span><br><span class="line">docker commmit -m=<span class="string">&quot;commited_information&quot;</span> -a=<span class="string">&quot;author_name&quot;</span> 容器<span class="built_in">id</span> name:tag</span><br><span class="line">docker push    <span class="comment">#发布镜像（docker hub 阿里云）</span></span><br></pre></td></tr></table></figure>
+<p>进入容器后</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">exit</span>         <span class="comment"># 退出并关闭容器</span></span><br><span class="line">ctrl+p+q     <span class="comment"># 退出容器 保持后台运行</span></span><br></pre></td></tr></table></figure>
+<p>通常将容器放在后台运行，此时如果需要进入当前正在运行的容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it 容器<span class="built_in">id</span> 进入后执行的命令   <span class="comment">#(通常执行bash)  </span></span><br><span class="line"><span class="comment">#或</span></span><br><span class="line">docker attach 容器<span class="built_in">id</span>       <span class="comment">#如果容器正在执行文件或有持续输出，则持续显示输出信息</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="关于宿主机与容器的文件交换"><a href="#关于宿主机与容器的文件交换" class="headerlink" title="关于宿主机与容器的文件交换"></a>关于宿主机与容器的文件交换</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 手动从容器拷贝文件到主机（只要容器在数据就在，无论是否运行，即docker ps -a存在即可）：</span></span><br><span class="line"><span class="comment"># 先进入容器</span></span><br><span class="line">docker attach 容器<span class="built_in">id</span> </span><br><span class="line"><span class="comment">#然后复制文件</span></span><br><span class="line">docker <span class="built_in">cp</span> 容器<span class="built_in">id</span>:/path/of/docker /path/of/linux</span><br><span class="line"><span class="comment"># 2. 在创建容器时挂载文件到容器内，实现双向同步</span></span><br><span class="line">docker run -it -v /path/of/local:/path/of/docker 镜像名称 bash</span><br></pre></td></tr></table></figure>
+<p>数据共享（目录挂载）时，将容器内的目录挂载到linux上，以实现容器的持久化和同步操作。容器之间的数据也可以共享。<br>可通过以下方式查看挂载信息</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">docker inspect 容器<span class="built_in">id</span></span><br><span class="line">[</span><br><span class="line">...</span><br><span class="line">        <span class="string">&quot;Mounts&quot;</span>: [</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="string">&quot;Type&quot;</span>: <span class="string">&quot;bind&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Source&quot;</span>: <span class="string">&quot;/home/hjj&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Destination&quot;</span>: <span class="string">&quot;/tmp&quot;</span>,</span><br><span class="line">                <span class="string">&quot;Mode&quot;</span>: <span class="string">&quot;&quot;</span>,</span><br><span class="line">                <span class="string">&quot;RW&quot;</span>: <span class="literal">true</span>,</span><br><span class="line">                <span class="string">&quot;Propagation&quot;</span>: <span class="string">&quot;rprivate&quot;</span></span><br><span class="line">            &#125;</span><br><span class="line">        ],</span><br><span class="line">...</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>-v后宿主机路径与容器路径会绑定，若本机不存在此路径则新建，文件双向绑定同步，即使exit退出容器只要镜像还在(docker ps -a)即可在本地修改文件并在容器中同步。即使删除容器，改变的数据文件已存在本地，所以不会丢失。<br>通过以下命令重新进入容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker start  容器<span class="built_in">id</span></span><br><span class="line">docker attatch 容器<span class="built_in">id</span></span><br></pre></td></tr></table></figure>
+<h4 id="文件挂载的两种方式"><a href="#文件挂载的两种方式" class="headerlink" title="文件挂载的两种方式"></a>文件挂载的两种方式</h4><h5 id="匿名挂载"><a href="#匿名挂载" class="headerlink" title="匿名挂载"></a>匿名挂载</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-v 容器内路径</span><br><span class="line">docker volume <span class="built_in">ls</span>  <span class="comment"># 查看所有卷，由于-v之后为给定本机路径，因此输出的 VOLUME NAME 为英文+数子的长字符串</span></span><br></pre></td></tr></table></figure>
+<h5 id="具名挂载-（常用）"><a href="#具名挂载-（常用）" class="headerlink" title="具名挂载 （常用）"></a>具名挂载 （常用）</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-v name:容器内路径  <span class="comment"># name中不包含/，否则表示本机路径 </span></span><br><span class="line">docker volume inspect name  <span class="comment">#查看卷</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-v /path/of/local:容器内路径 <span class="comment">#表示指定路径挂载</span></span><br><span class="line"><span class="comment"># 未指定目录的情况下挂载在本机/var/lib/docker</span></span><br></pre></td></tr></table></figure>
+<p>容器内路径后可通过 <strong>:ro rw</strong> 来改变读写权限，表示只读&#x2F;只写，ro表示容器中此路径只能通过宿主机操作</p>
+<h3 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h3><p><a target="_blank" rel="noopener" href="https://docs.docker.com/engine/reference/builder/">Dockerfile官方说明</a><br>用于构建docker的构建文件，为命令脚本,通过docker build构建成为镜像。很多官方镜像都是基础包（FROM scratch)，缺乏很多功能如vim，因此通常自己制作镜像。<br>面向开发，通常用于发布项目&#x2F;做镜像，镜像已逐渐成为企业交付的标准。DockerImages通过DockerFile生成的镜像 最终发布和运行的产品。<br>Dockerfile中关键字建议大写，指令小写，用 <strong>#</strong> 注释。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span>                     <span class="comment"># 基础镜像 从此开始构建</span></span><br><span class="line"><span class="keyword">MAINTAINER</span>        <span class="comment"># 维护者 姓名➕邮箱</span></span><br><span class="line"><span class="keyword">RUN</span><span class="language-bash">                        <span class="comment"># 构建镜像时需要运行的命令</span></span></span><br><span class="line"><span class="keyword">ADD</span><span class="language-bash">                        <span class="comment"># 可将压缩包自动解压到容器指定路径下  ADD xxx.tgz /path</span></span></span><br><span class="line"><span class="keyword">WORKDIR</span><span class="language-bash">             <span class="comment"># 镜像的工作目录</span></span></span><br><span class="line"><span class="keyword">VOLUME</span><span class="language-bash">               <span class="comment"># 挂载的目录</span></span></span><br><span class="line"><span class="keyword">EXPOSE</span>                <span class="comment"># 同-p  暴露端口</span></span><br><span class="line"><span class="keyword">CMD</span><span class="language-bash">                      <span class="comment"># 指定容器启动时运行的命令  只有最后一个会生效，可被替代 可通过&amp;&amp;执行多个命令</span></span></span><br><span class="line"><span class="keyword">ENTRYPOINT</span><span class="language-bash">    <span class="comment"># 指定容器启动时运行的命令 可以追加</span></span></span><br><span class="line"><span class="keyword">ONBUILD</span>             <span class="comment"># 当构建一个被继承的dockerfile时，ONBUILD就会运行</span></span><br><span class="line"><span class="keyword">COPY</span><span class="language-bash">                    <span class="comment"># 类似ADD  将文件拷贝到镜像中</span></span></span><br><span class="line"><span class="keyword">ENV</span>                       <span class="comment"># 构建时设置环境变了</span></span><br></pre></td></tr></table></figure>
+<p>通过以下命令创建镜像。注意最后的 <strong>.</strong> 表示当前路径不要遗漏。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -f dockerfile_name -t 镜像名[:tag]  .</span><br></pre></td></tr></table></figure>
+<p>若命名为Dockerfile可省去-f dockerfile_name的指令。</p>
+<h4 id="Dockerfile中CMD与ENTRYPOINT区别"><a href="#Dockerfile中CMD与ENTRYPOINT区别" class="headerlink" title="Dockerfile中CMD与ENTRYPOINT区别"></a>Dockerfile中CMD与ENTRYPOINT区别</h4><p>对于dockerfile创建的镜像，可通过以下命令来指定运行容器后需要执行的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run 镜像<span class="built_in">id</span> [cmd] </span><br></pre></td></tr></table></figure>
+<p>此cmd会覆盖Dockefile中CMD指定的命令，而对于ENTRYPOINT指定的命令，cmd会追加在命令后执行，不会忽略。</p>
+<h3 id="镜像发布"><a href="#镜像发布" class="headerlink" title="镜像发布"></a>镜像发布</h3><p>可将打包好的镜像发布至 <strong><a target="_blank" rel="noopener" href="https://hub.docker.com/">docker官网镜像网站</a></strong> 供他人下载，也可以在此寻找别人打包好的镜像。<br>在提交到hub之前必须给镜像加上tag:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker tag SOURCE_IMAGE[:TAG] hub_username/TARGET_IMAGE[:TAG]</span><br></pre></td></tr></table></figure>
+<p>hub_username为docker账号的用户名，且提交前必须在镜像前加上此字段，然后:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker push hub_username/TARGET_IMAGE[:TAG]</span><br></pre></td></tr></table></figure>
+<p>即可在镜像网站中登陆查看到。<br>也可以推送至阿里云（收费托管）</p>
+<h3 id="个人常用命令"><a href="#个人常用命令" class="headerlink" title="个人常用命令"></a>个人常用命令</h3><p>从tensorflow官网拉取镜像运行tf-GPU(若GPU设备足够(算力(Compute Capability)大于5.2)可使用<a target="_blank" rel="noopener" href="https://catalog.ngc.nvidia.com/orgs/nvidia/containers/tensorflow">NVIDIA-docker官网的TensorFlow镜像</a>):</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --gpus all -it --<span class="built_in">rm</span>  -v <span class="variable">$PWD</span>:/tmp -w /tmp tensorflow/tensorflow:latest-gpu bash</span><br></pre></td></tr></table></figure>
+<p>需要手动安装scipy&#x2F;matplotlib&#x2F;vim等库&#x2F;软件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">docker ps -a        <span class="comment">#正在以及历史运行的容器</span></span><br><span class="line">docker ps -a -n=1   <span class="comment">#只显示一个</span></span><br><span class="line">docker ps -aq -n=1  <span class="comment">#只显示一个并只显示id</span></span><br><span class="line"></span><br><span class="line">docker <span class="built_in">rm</span> -f $(docker ps -aq) <span class="comment">#查询所有容器id并逐个删除容器</span></span><br><span class="line"></span><br><span class="line">docker logs -tf -<span class="built_in">tail</span> n <span class="comment">#带时间戳查看最新n个log</span></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="踩坑记录"><a href="#踩坑记录" class="headerlink" title="踩坑记录"></a>踩坑记录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d 镜像名  <span class="comment"># 对于某些镜像，在docker ps时不会找到，因为后台运行时必须要有一个前台进程  否则docker发现没有应用会自动停止</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+    </article>
+    <!-- license -->
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2022/09/02/CESM_1.1/" title="Ubuntu 20.04 下cesm1.1 的移植与测试">
+                    <div class="prevTitle">Ubuntu 20.04 下cesm1.1 的移植与测试</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:1959059596@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//https://github.com/HJJ124" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+        <div class="website-approve">
+            
+            
+        </div>
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Dcoker%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">1.</span> <span class="toc-text">Dcoker是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%B9%E5%99%A8%E5%8C%96%E6%8A%80%E6%9C%AF-%E7%9B%B4%E6%8E%A5%E8%BF%90%E8%A1%8C%E5%9C%A8%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8A%EF%BC%88%E5%AE%BF%E4%B8%BB%E6%9C%BA%E5%86%85%E6%A0%B8%E4%B8%AD%EF%BC%89%E6%B2%A1%E6%9C%89%E8%99%9A%E6%8B%9F%E7%A1%AC%E4%BB%B6-%E5%86%85%E6%A0%B8%E7%BA%A7%E5%88%AB%E8%99%9A%E6%8B%9F%E5%8C%96-%E8%BD%BB%E4%BE%BF-%E6%AF%8F%E4%B8%AA%E5%AE%B9%E5%99%A8%E9%97%B4%E4%BA%92%E7%9B%B8%E9%9A%94%E7%A6%BB-%E5%90%84%E6%9C%89%E8%87%AA%E5%B7%B1%E7%9A%84%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F-%E9%80%9A%E8%BF%87%E9%95%9C%E5%83%8F%E7%94%9F%E6%88%90%E5%AE%B9%E5%99%A8"><span class="toc-number">1.0.1.</span> <span class="toc-text">容器化技术 直接运行在操作系统上（宿主机内核中）没有虚拟硬件  内核级别虚拟化 轻便 每个容器间互相隔离 各有自己的文件系统 通过镜像生成容器</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker%E5%85%A5%E9%97%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">2.</span> <span class="toc-text">Docker入门命令</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E6%A6%82%E8%A7%88"><span class="toc-number">2.1.</span> <span class="toc-text">命令概览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E4%BA%8E%E5%AE%BF%E4%B8%BB%E6%9C%BA%E4%B8%8E%E5%AE%B9%E5%99%A8%E7%9A%84%E6%96%87%E4%BB%B6%E4%BA%A4%E6%8D%A2"><span class="toc-number">2.2.</span> <span class="toc-text">关于宿主机与容器的文件交换</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E6%8C%82%E8%BD%BD%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-number">2.2.1.</span> <span class="toc-text">文件挂载的两种方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%8C%BF%E5%90%8D%E6%8C%82%E8%BD%BD"><span class="toc-number">2.2.1.1.</span> <span class="toc-text">匿名挂载</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%85%B7%E5%90%8D%E6%8C%82%E8%BD%BD-%EF%BC%88%E5%B8%B8%E7%94%A8%EF%BC%89"><span class="toc-number">2.2.1.2.</span> <span class="toc-text">具名挂载 （常用）</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Dockerfile"><span class="toc-number">2.3.</span> <span class="toc-text">Dockerfile</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Dockerfile%E4%B8%ADCMD%E4%B8%8EENTRYPOINT%E5%8C%BA%E5%88%AB"><span class="toc-number">2.3.1.</span> <span class="toc-text">Dockerfile中CMD与ENTRYPOINT区别</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%95%9C%E5%83%8F%E5%8F%91%E5%B8%83"><span class="toc-number">2.4.</span> <span class="toc-text">镜像发布</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%AA%E4%BA%BA%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">2.5.</span> <span class="toc-text">个人常用命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-number">2.6.</span> <span class="toc-text">踩坑记录</span></a></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 4
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/09/02/CESM_1.1/">Ubuntu 20.04 下cesm1.1 的移植与测试</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/02</span>
+            <a class="archive-post-title" href="/2022/09/02/Docker/">Docker 笔记</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/28</span>
+            <a class="archive-post-title" href="/2022/03/28/Ubuntu-20-04%E4%B8%8B-netcdf%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85/">Ubuntu 20.04下 netcdf库的安装</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/09/02/hello-world/">Hello World</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Model">
+                <span class="iconfont-archer">&#xe606;</span>
+                Model
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Software">
+                <span class="iconfont-archer">&#xe606;</span>
+                Software
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://ihjj.cn",
+        root: siteMetaRoot,
+        author: "Junjie Huang"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>

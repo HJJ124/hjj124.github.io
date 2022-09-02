@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <!-- title -->
+
+
+    
+
+<!-- keywords -->
+
+
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Junjie Huang">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Junjie Huang">
+    
+        <meta name="keywords" content="hexo,hexo-theme,hexo-blog">
+    
+    <meta name="description" content=" Welcome">
+    <meta name="description" content="前言开始之前先要安装库以及相应软件，过程省略，具体在官网：CESM1.1.z User’s GuideCESM Software&#x2F;Operating System Prerequisites.CESM各个版本：CESM Models也可在github中下载:GitHub-ESCOMP&#x2F;CESM: The Community Earth System ModelThe Commu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ubuntu 20.04 下cesm1.1 的移植与测试">
+<meta property="og:url" content="https://ihjj.cn/2022/05/22/CESM_1.1/index.html">
+<meta property="og:site_name" content="Astro的踩坑记录">
+<meta property="og:description" content="前言开始之前先要安装库以及相应软件，过程省略，具体在官网：CESM1.1.z User’s GuideCESM Software&#x2F;Operating System Prerequisites.CESM各个版本：CESM Models也可在github中下载:GitHub-ESCOMP&#x2F;CESM: The Community Earth System ModelThe Commu">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-05-22T07:30:23.235Z">
+<meta property="article:modified_time" content="2022-05-22T07:30:23.235Z">
+<meta property="article:author" content="Junjie Huang">
+<meta property="article:tag" content="Model">
+<meta property="article:tag" content="Software">
+<meta name="twitter:card" content="summary">
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <link rel="icon" href="/assets/favicon.ico">
+    
+    <title>Ubuntu 20.04 下cesm1.1 的移植与测试 · Astro&#39;s 踩坑记录</title>
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+    (function (w) {
+        'use strict'
+        // rel=preload support test
+        if (!w.loadCSS) {
+            w.loadCSS = function () {}
+        }
+        // define on the loadCSS obj
+        var rp = (loadCSS.relpreload = {})
+        // rel=preload feature support test
+        // runs once and returns a function for compat purposes
+        rp.support = (function () {
+            var ret
+            try {
+                ret = w.document.createElement('link').relList.supports('preload')
+            } catch (e) {
+                ret = false
+            }
+            return function () {
+                return ret
+            }
+        })()
+
+        // if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+        // then change that media back to its intended value on load
+        rp.bindMediaToggle = function (link) {
+            // remember existing media attr for ultimate state, or default to 'all'
+            var finalMedia = link.media || 'all'
+
+            function enableStylesheet() {
+                link.media = finalMedia
+            }
+
+            // bind load handlers to enable media
+            if (link.addEventListener) {
+                link.addEventListener('load', enableStylesheet)
+            } else if (link.attachEvent) {
+                link.attachEvent('onload', enableStylesheet)
+            }
+
+            // Set rel and non-applicable media type to start an async request
+            // note: timeout allows this to happen async to let rendering continue in IE
+            setTimeout(function () {
+                link.rel = 'stylesheet'
+                link.media = 'only x'
+            })
+            // also enable media after 3 seconds,
+            // which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+            setTimeout(enableStylesheet, 3000)
+        }
+
+        // loop through link elements in DOM
+        rp.poly = function () {
+            // double check this to prevent external calls from running
+            if (rp.support()) {
+                return
+            }
+            var links = w.document.getElementsByTagName('link')
+            for (var i = 0; i < links.length; i++) {
+                var link = links[i]
+                // qualify links to those with rel=preload and as=style attrs
+                if (
+                    link.rel === 'preload' &&
+                    link.getAttribute('as') === 'style' &&
+                    !link.getAttribute('data-loadcss')
+                ) {
+                    // prevent rerunning on link
+                    link.setAttribute('data-loadcss', true)
+                    // bind listeners to toggle media back
+                    rp.bindMediaToggle(link)
+                }
+            }
+        }
+
+        // if unsupported, run the polyfill
+        if (!rp.support()) {
+            // run once at least
+            rp.poly()
+
+            // rerun poly on an interval until onload
+            var run = w.setInterval(rp.poly, 500)
+            if (w.addEventListener) {
+                w.addEventListener('load', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            } else if (w.attachEvent) {
+                w.attachEvent('onload', function () {
+                    rp.poly()
+                    w.clearInterval(run)
+                })
+            }
+        }
+
+        // commonjs
+        if (typeof exports !== 'undefined') {
+            exports.loadCSS = loadCSS
+        } else {
+            w.loadCSS = loadCSS
+        }
+    })(typeof global !== 'undefined' ? global : this)
+</script>
+
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s infinite;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20211217" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="/css/dark.css?v=20211217" as="style">
+    <link rel="stylesheet" href="/css/dark.css">
+    <link rel="stylesheet" href="/css/mobile.css?v=20211217" media="(max-width: 960px)">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js?v=20211217" as="script">
+    <link rel="preload" href="/scripts/dark.js?v=20211217" as="script">
+    <link rel="preload" href="/font/Oswald-Regular.ttf" as="font" crossorigin>
+    <link rel="preload" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" as="font" crossorigin>
+    <!-- algolia -->
+    
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+<meta name="generator" content="Hexo 6.2.0"><link rel="alternate" href="/atom.xml" title="Astro的踩坑记录" type="application/atom+xml">
+</head>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ == undefined) {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js" />')
+        }
+    </script>
+    
+        <body class="post-body">
+    
+        <!-- header -->
+        <header class="header header-mobile">
+    <!-- top read progress line -->
+    <div class="header-element">
+        <div class="read-progress"></div>
+    </div>
+    <!-- sidebar menu button -->
+    <div class="header-element">
+        
+            <div class="header-sidebar-menu">
+        
+            
+                <div style="padding-left: 1px;">&#xe775;</div>
+            
+        </div>
+    </div>
+    <!-- header actions -->
+    <div class="header-actions">
+        <!-- theme mode switch button -->
+        <span class="header-theme-btn header-element">
+            <i class="fas fa-adjust"></i>
+        </span>
+        <!-- back to home page text -->
+        <span class="home-link header-element">
+            <a href=/>Astro's 踩坑记录</a>
+        </span>
+    </div>
+    <!-- toggle banner for post layout -->
+    
+        
+            <div class="banner">
+        
+            <div class="blog-title header-element">
+                <a href="/">Astro&#39;s 踩坑记录</a>
+            </div>
+            <div class="post-title header-element">
+                <a href="#" class="post-name">Ubuntu 20.04 下cesm1.1 的移植与测试</a>
+            </div>
+        </div>
+    
+</header>
+
+        <!-- fixed footer -->
+        <footer class="footer-fixed">
+    <!-- back to top button -->
+    <div class="footer-fixed-element">
+        
+            <div class="back-top back-top-hidden">
+        
+        
+            <div>&#xe639;</div>
+        
+        </div>
+    </div>
+</footer>
+
+        <!-- wrapper -->
+        <div class="wrapper">
+            <div class="site-intro" style="
+
+
+
+
+
+
+
+    height:50vh;
+
+">
+    
+    <!-- 主页  -->
+    
+        
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+                Ubuntu 20.04 下cesm1.1 的移植与测试
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+                
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页 meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class= post-intro-tags >
+    
+        
+        
+            
+        
+        
+        <span class="post-category" data-categories="Linux"">
+            <i class="fas fa-folder post-category-icon"></i>
+            <span class="post-category-text">
+                Linux
+            </span>
+        </span>
+    
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Model">Model</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="Software">Software</a>
+    
+</div>
+
+                
+                
+                    <div class="post-intro-read">
+                        <span>字数统计: <span class="post-count word-count">1.6k</span>阅读时长: <span class="post-count reading-time">7 min</span></span>
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <!-- 撰写日期 -->
+                    <span class="iconfont-archer post-intro-calander">&#xe676;</span>
+                    <span class="post-intro-time">2022/05/22</span>
+                    <!-- busuanzi -->
+                    
+                        <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                            <span class="iconfont-archer post-intro-busuanzi">&#xe602;</span>
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    
+                    <!-- 文章分享 -->
+                    <span class="share-wrapper">
+                        <span class="iconfont-archer share-icon">&#xe71d;</span>
+                        <span class="share-text">Share</span>
+                        <ul class="share-list">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+
+            <script>
+  // get user agent
+  function getBrowserVersions() {
+    var u = window.navigator.userAgent
+    return {
+      userAgent: u,
+      trident: u.indexOf('Trident') > -1, //IE内核
+      presto: u.indexOf('Presto') > -1, //opera内核
+      webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+      gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+      mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+      ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+      android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+      iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+      iPad: u.indexOf('iPad') > -1, //是否为iPad
+      webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+      weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+      uc: u.indexOf('UCBrowser') > -1, //是否为android下的UC浏览器
+    }
+  }
+  var browser = {
+    versions: getBrowserVersions(),
+  }
+  console.log('userAgent: ' + browser.versions.userAgent)
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded')
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document
+        .getElementsByClassName('intro-title')[0]
+        .classList.add('intro-fade-in')
+      document
+        .getElementsByClassName('intro-subtitle')[0]
+        .classList.add('intro-fade-in')
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in')
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb() {
+    if (browser.versions.uc) {
+      console.log('UCBrowser')
+      fontLoaded()
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular'],
+        },
+        loading: function () {
+          // 所有字体开始加载
+          // console.log('font loading');
+        },
+        active: function () {
+          // 所有字体已渲染
+          fontLoaded()
+        },
+        inactive: function () {
+          // 字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout')
+          fontLoaded()
+        },
+        timeout: 5000, // Set the timeout to two seconds
+      })
+    }
+  }
+
+  function asyncErr() {
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document,
+      t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0]
+    o.src = u
+    if (cb) {
+      o.addEventListener(
+        'load',
+        function (e) {
+          cb(null, e)
+        },
+        false
+      )
+    }
+    if (err) {
+      o.addEventListener(
+        'error',
+        function (e) {
+          err(null, e)
+        },
+        false
+      )
+    }
+    s.parentNode.insertBefore(o, s)
+  }
+
+  var asyncLoadWithFallBack = function (arr, success, reject) {
+    var currReject = function () {
+      reject()
+      arr.shift()
+      if (arr.length) async(arr[0], success, currReject)
+    }
+
+    async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack(
+    [
+      'https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js',
+      'https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js',
+      "/lib/webfontloader.min.js",
+    ],
+    asyncCb,
+    asyncErr
+  )
+</script>
+
+            <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+            <div class="container container-unloaded">
+                <main class="main post-page">
+    <article class="article-entry">
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>开始之前先要安装库以及相应软件，过程省略，具体在官网：<br><a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/usersguide/book1.html">CESM1.1.z User’s Guide</a><br><a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/usersguide/x21.html#software_system_prerequisites">CESM Software&#x2F;Operating System Prerequisites</a>.<br>CESM各个版本：<a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/?ref=hp">CESM Models</a><br>也可在github中下载:<br><a target="_blank" rel="noopener" href="https://github.com/ESCOMP/CESM">GitHub-ESCOMP&#x2F;CESM: The Community Earth System ModelThe Community Earth System Model.</a></p>
+<hr>
+<h3 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h3><p>本文重点在于source code移植后的修改配置部分<br>假设模式位于 <strong>cesm1_1&#x2F;</strong><br>需要修改的文件均位于 <strong>cesm1_1&#x2F;scripts&#x2F;ccsm_utils&#x2F;Machines</strong> 路径下</p>
+<h4 id="config-machines-xml"><a href="#config-machines-xml" class="headerlink" title="config_machines.xml"></a><strong>config_machines.xml</strong></h4><p>主要是修改关于机器的配置<br>添加以下部分 （根据自己服务器的配置&#x2F;环境来配置。具体各项意义可见官网<a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/modelnl/">CESM Models | CESM1.1 Public Release</a>）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">&lt;machine MACH=<span class="string">&quot;ubuntu&quot;</span>&gt;</span><br><span class="line">        &lt;DESC&gt;my ubuntu 20.04&lt;/DESC&gt;</span><br><span class="line">        &lt;OS&gt;LINUX&lt;/OS&gt;</span><br><span class="line">        &lt;COMPILERS&gt;intel,pgi,gnu,pathscale&lt;/COMPILERS&gt;</span><br><span class="line">        &lt;MPILIBS&gt;mpich,mpi,pempi,mpi-serial&lt;/MPILIBS&gt;</span><br><span class="line">        &lt;RUNDIR&gt;/xxxxxxxxx/cesm1_1/<span class="variable">$CASE</span>/run&lt;/RUNDIR&gt;</span><br><span class="line">        &lt;EXEROOT&gt;/xxxxxxxx/cesm1_1/<span class="variable">$CASE</span>/bld&lt;/EXEROOT&gt;</span><br><span class="line">        &lt;DIN_LOC_ROOT&gt;/xxxxxx/Cesm_data/inputdata&lt;/DIN_LOC_ROOT&gt;&lt;DIN_LOC_ROOT_CLMFORC&gt;xxxxxxx/Cesm_data/tss&lt;/DIN_LOC_ROOT_CLMFORC&gt;</span><br><span class="line">        &lt;DOUT_S_ROOT&gt;xxxxxx/cesm1_1/<span class="variable">$CASE</span>/output&lt;/DOUT_S_ROOT&gt;</span><br><span class="line">        &lt;DOUT_L_MSROOT&gt;csm/<span class="variable">$CASE</span>&lt;/DOUT_L_MSROOT&gt;&lt;CCSM_BASELINE&gt;<span class="variable">$ENV</span>&#123;CESMDATAROOT&#125;/ccsm_baselines&lt;/CCSM_BASELINE&gt;&lt;CCSM_CPRNC&gt;<span class="variable">$ENV</span>&#123;CESMDATAROOT&#125;/tools/cprnc/cprnc&lt;/CCSM_CPRNC&gt;</span><br><span class="line">        &lt;BATCHQUERY&gt;USERDEFINED_optional_run&lt;/BATCHQUERY&gt;</span><br><span class="line">        &lt;BATCHSUBMIT&gt;USERDEFINED_optional_run&lt;/BATCHSUBMIT&gt;&lt;SUPPORTED_BY&gt;USERDEFINED_optional_run&lt;/SUPPORTED_BY&gt;</span><br><span class="line">        &lt;GMAKE_J&gt;1&lt;/GMAKE_J&gt;</span><br><span class="line">        &lt;MAX_TASKS_PER_NODE&gt;2&lt;/MAX_TASKS_PER_NODE&gt;</span><br><span class="line">        &lt;PES_PER_NODE&gt;1&lt;/PES_PER_NODE&gt;</span><br><span class="line">&lt;/machine&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="config-compilers-xml"><a href="#config-compilers-xml" class="headerlink" title="config_compilers.xml"></a><strong>config_compilers.xml</strong></h4><p>关于编译器的配置<br>添加以下部分</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&lt;compiler COMPILER=<span class="string">&quot;intel&quot;</span> MACH=<span class="string">&quot;ubuntu&quot;</span>&gt;</span><br><span class="line"> &lt;NETCDF_PATH&gt;$(NETCDF)&lt;/NETCDF_PATH&gt;</span><br><span class="line"> &lt;MPICC&gt;mpiicc&lt;/MPICC&gt;</span><br><span class="line"> &lt;MPIFC&gt;mpiifort&lt;/MPIFC&gt;</span><br><span class="line"> &lt;MPICXX&gt;mpicpc&lt;/MPICXX&gt;</span><br><span class="line"> &lt;SFC&gt;ifort&lt;/SFC&gt;</span><br><span class="line"> &lt;SCC&gt;icc&lt;/SCC&gt;</span><br><span class="line"> &lt;SCXX&gt;icpc&lt;/SCXX&gt;</span><br><span class="line"> &lt;MPI_PATH MPILIB=<span class="string">&quot;mpich&quot;</span>&gt; /opt/intel/oneapi/mpi/2021.2.0&lt;/MPI_PATH&gt;</span><br><span class="line"> &lt;MPI_PATH MPILIB=<span class="string">&quot;openmpi&quot;</span>&gt; /opt/intel/oneapi/mpi/2021.2.0&lt;/MPI_PATH&gt;</span><br><span class="line"> &lt;HDF5_PATH&gt;$(NETCDF)&lt;/HDF5_PATH&gt;</span><br><span class="line"> &lt;ADD_SLIBS&gt; -L$(NETCDF_PATH)/lib -lnetcdff -lnetcdf -L$(HDF5_PATH)/lib -lhdf5 -lhdf5_hl &lt;/ADD_SLIBS&gt;</span><br><span class="line">&lt;/compiler&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="env-mach-specific-userdefined"><a href="#env-mach-specific-userdefined" class="headerlink" title="env_mach_specific.userdefined"></a><strong>env_mach_specific.userdefined</strong></h4><p>将 <strong>env_mach_specific.userdefined</strong>  复制为  <strong>env_mach_specific.ubuntu</strong><br>点后面（ubuntu）为之前设置的MACH名称<br>添加以下部分，注意 set 后面有&#x3D;，且&#x3D;前后有空格。setenv没有等号，只有空格</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">set NETCDF_PATH = /usr/local/netcdf-ifort</span><br><span class="line">set MPI_PATH = /opt/intel/oneapi/mpi/2021.2.0</span><br><span class="line">setenv INC_NETCDF $&#123;NETCDF_PATH&#125;/include</span><br><span class="line">setenv LIB_NETCDF $&#123;NETCDF_PATH&#125;/lib</span><br><span class="line">setenv INC_MPI $&#123;MPI_PATH&#125;/include</span><br><span class="line">setenv LIB_MPI $&#123;MPI_PATH&#125;/lib</span><br></pre></td></tr></table></figure>
+<h4 id="mkbatch-userdefined"><a href="#mkbatch-userdefined" class="headerlink" title="mkbatch.userdefined"></a>mkbatch.userdefined</h4><p>将 <strong>mkbatch.userdefined</strong> 复制为 <strong>mkbatch.ubuntu</strong><br>点后面依旧是之前设置的MACH名称<br>根据服务器提交作业的方式把qname&#x3D;batch 为自己服务器的脚本提交方式，如 qname&#x3D;qnormal，并把下方##的代码根据提交任务的脚本 去掉注释即可 （包括mpirun等等命令所在的行)</p>
+<h3 id="完成移植，进行测试。"><a href="#完成移植，进行测试。" class="headerlink" title="完成移植，进行测试。"></a>完成移植，进行测试。</h3><h4 id="测试1"><a href="#测试1" class="headerlink" title="测试1"></a>测试1</h4><p>此测试来自官方网站：<a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/usersguide/c1986.html#use_case_basic">Use Cases and FAQs</a></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> cesm1_1/scripts</span><br><span class="line">./create_newcase -<span class="keyword">case</span>  case_official \</span><br><span class="line">                 -compset B_1850_CN \</span><br><span class="line">                 -res 0.9x1.25_gx1v6 \</span><br><span class="line">                 -mach ubuntu</span><br><span class="line"> </span><br><span class="line"><span class="built_in">cd</span> case_official/</span><br></pre></td></tr></table></figure>
+<p>此时可根据需要修改运行配置如大气模式用到的核数  NTASKS_ATM …..  （当前该变量值可通过以下命令查询到。）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./xmlquery NTASKS_ATM  </span><br></pre></td></tr></table></figure>
+<p>对于修改诸如模式要用的核数<strong>NTASKS_xxxxx</strong>、线程数<strong>NTHRDS_xxx</strong>等等<strong>env_mach_pes.xml</strong>中的变量，必须在.&#x2F;cesm_setup之前修改，如果setup之后修改，必须先.&#x2F;cesm_setup -clean，修改，然后重新.&#x2F;cesm_setup。<br>对于诸如任务重新提交时间<strong>STOP_OPTION</strong>等等其他变量，可在.&#x2F;cesm_setup之后修改<br>两种修改方式：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">1  ./xmlchange NTASKS_ATM=64   （等价于 ./xmlchange -file env_mach_pes.xml -<span class="built_in">id</span> NTASKS_ATM -val 64）</span><br></pre></td></tr></table></figure>
+<p>2      直接vim修改<strong>env_mach_pes.xml</strong> 或是其余xml文件<br>同上，所有与运行相关的配置变量可在<a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/modelnl/">CESM Models | CESM1.1 Public Release</a>通过对应xml文件查找到。</p>
+<hr>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./cesm_setup</span><br><span class="line">./case_official.build</span><br></pre></td></tr></table></figure>
+<p>生成测试脚本（测试本例子能否跑通）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./create_production_test</span><br><span class="line"><span class="built_in">cd</span> ../case_official_ERT</span><br><span class="line">./case_official_ERT.test_build</span><br><span class="line">./case_official_ERT.<span class="built_in">test</span></span><br><span class="line"><span class="built_in">cat</span> CaseStatus    (官网为 <span class="built_in">cat</span> TestStatus ，以实际为准)</span><br></pre></td></tr></table></figure>
+<p>如果没有问题（PASS）即可进行下一步</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ../case_official</span><br><span class="line">./xmlchange STOP_OPTION=nmonths   注意修改方式与官网给出的不一致</span><br><span class="line">./xmlchange STOP_N=12</span><br><span class="line">bsub &lt; case_official.run   提交作业方法因服务器而异</span><br></pre></td></tr></table></figure>
+<p>之后可在out文件中查看是否成功</p>
+<h4 id="测试2"><a href="#测试2" class="headerlink" title="测试2"></a>测试2</h4><h5 id="创建一个分辨率为10-amp-deg-x15-amp-deg-，只运行大气模块的试验"><a href="#创建一个分辨率为10-amp-deg-x15-amp-deg-，只运行大气模块的试验" class="headerlink" title="创建一个分辨率为10&amp;deg;x15&amp;deg;，只运行大气模块的试验"></a>创建一个分辨率为10&amp;deg;x15&amp;deg;，只运行大气模块的试验</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">./create_newcase -<span class="keyword">case</span> coarse_amip -compset  FAMIPC5 -res 10x15_10x15  -mach ubuntu</span><br><span class="line"><span class="built_in">cd</span> coarse_amip</span><br><span class="line">./cesm_setup</span><br><span class="line">./coarse_amip.build</span><br></pre></td></tr></table></figure>
+<h5 id="生成测试的试运行脚本"><a href="#生成测试的试运行脚本" class="headerlink" title="生成测试的试运行脚本"></a>生成测试的试运行脚本</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">./create_production_test</span><br><span class="line"><span class="built_in">cd</span> ../coarse_amip._ERT</span><br><span class="line">./coarse_amip_ERT.build</span><br><span class="line">./coarse_amip_ERT.run</span><br><span class="line"><span class="built_in">cat</span> TestStatus</span><br></pre></td></tr></table></figure>
+<h5 id="修改运行设置"><a href="#修改运行设置" class="headerlink" title="修改运行设置"></a>修改运行设置</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> ../coarse_amip</span><br></pre></td></tr></table></figure>
+<p>设置例如积分时长，运行月份，变量输出频率的配置<br>对于自定义输出，可见: <a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/usersguide/x2280.html">CAM: How do I customize CAM output fields?</a><br>在 <strong>user_nl_xxx</strong> 中修改xxx（如CAM，CLM…）模块的namelist设置，如cam模块变量输出频率见: <a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.1/cesm/doc/modelnl/nl_cam.html">CAM Component Model Namelist Variables</a><br>以user_nl_cam为例:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">;history文件中所有变量的平均输出标志，两个值表示同时两种设置</span><br><span class="line">avgflag_pertpe = &#x27;A&#x27;,&#x27;A&#x27;</span><br><span class="line"></span><br><span class="line">;数组，各history文件序列的输出频率，第一个为0表示月平均，往后i大于0表示n个时步，小于0表示n小时</span><br><span class="line">nhtfrq = 0,-24  </span><br><span class="line"></span><br><span class="line">;数组，样本写入历史文件h0的最大次数，第一个数表示主历史文件，2-6表示辅助历史文件</span><br><span class="line">mfilt  = 1,1 </span><br><span class="line"></span><br><span class="line">;第一个历史文件 h0 包括的变量场</span><br><span class="line">fincl1= &#x27;T&#x27;,&#x27;TMQ&#x27;,&#x27;TS&#x27;,&#x27;U&#x27;,&#x27;V&#x27;,&#x27;Z3&#x27; </span><br><span class="line"></span><br><span class="line">;第二个历史文件 h1 包括的变量场</span><br><span class="line">fincl2 = &#x27;FLDS&#x27;,&#x27;FLNS&#x27;,&#x27;FLNT&#x27;,&#x27;OMEGA&#x27;,&#x27;PSL&#x27;,&#x27;PS&#x27;,&#x27;RELHUM&#x27;,&#x27;Q&#x27;,&#x27;SHFLX&#x27;,&#x27;T&#x27;,&#x27;TMQ&#x27;,&#x27;TS&#x27;,&#x27;U&#x27;,&#x27;V&#x27;,&#x27;Z3&#x27;          </span><br></pre></td></tr></table></figure>
+<p>修改后查询结果：  </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./preview_namelist </span><br></pre></td></tr></table></figure>
+<p>然后在 CaseDocs&#x2F;atm_in 查看设置的上述变量是否出现  </p>
+<h5 id="运行并查看当前运行状态"><a href="#运行并查看当前运行状态" class="headerlink" title="运行并查看当前运行状态"></a>运行并查看当前运行状态</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./coarse_amip.run</span><br></pre></td></tr></table></figure>
+<p>当前运行状态位于</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$CESMROOT</span>/<span class="variable">$CASENAME</span>/run/xxx.log.yymmdd-hhmmss</span><br></pre></td></tr></table></figure>
+<p>如 cesm1_1&#x2F;coarse_amip&#x2F;run&#x2F;atm.log.220520-145438 模式积分完成后会被删除</p>
+<h5 id="运行结束"><a href="#运行结束" class="headerlink" title="运行结束"></a>运行结束</h5><p><a target="_blank" rel="noopener" href="https://www.cesm.ucar.edu/models/cesm1.0/filename_conventions_cesm.html">CCSM4&#x2F;CESM1 OUTPUT FILENAME REQUIREMENTS</a><br>文件储存分为 <strong>short-term archiving</strong> 和 <strong>long-term archiving</strong> ,分别通过 <strong>env_run.xml</strong> 中 <strong>$DOUT_S</strong> 和 <strong>$DOUT_L_MS</strong> 来控制，输出路径分别为 <strong>$DOUT_S_ROOT</strong> 、 <strong>$DOUT_L_MSROOT</strong><br>模式输出文件位于</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$CESMROOT</span>/<span class="variable">$CASENAME</span>/output/xxx/</span><br></pre></td></tr></table></figure>
+<p>其中XXX表示如atm,ocn,ice等的分量模式输出<br>再下一级目录的</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hist/ init/ logs/ rest/</span><br></pre></td></tr></table></figure>
+<p>表示history,initial,logs,restart文件<br>在 <strong>CaseStatus</strong> 中最后一行看到 <strong>run SUCCESSFUL</strong> 并在相应路径有nc文件输出即为成功</p>
+<h3 id="踩坑记录"><a href="#踩坑记录" class="headerlink" title="踩坑记录"></a>踩坑记录</h3><h4 id="如果出现-Can’t-locate-Switch-pm-in-INC-则是因为Perl5-1以上的版本问题，只需将已有的Switch-pm-文件复制到INC中一个路径即可"><a href="#如果出现-Can’t-locate-Switch-pm-in-INC-则是因为Perl5-1以上的版本问题，只需将已有的Switch-pm-文件复制到INC中一个路径即可" class="headerlink" title="如果出现 Can’t locate Switch.pm in @INC  则是因为Perl5.1以上的版本问题，只需将已有的Switch.pm 文件复制到INC中一个路径即可"></a>如果出现 <strong>Can’t locate Switch.pm in @INC</strong>  则是因为<strong>Perl5.1</strong>以上的版本问题，只需将已有的<strong>Switch.pm</strong> 文件复制到INC中一个路径即可</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">cp</span> /opt/intel/oneapi/compiler/2021.2.0/linux/lib/oclfpga/host/linux64/bin/perl/lib/site_perl/5.30.3/Switch.pm /usr/share/perl/5.30/</span><br></pre></td></tr></table></figure>
+<h4 id="无gmake的情况：ubuntu上取消了gmake（GNUmake），用make代替即可"><a href="#无gmake的情况：ubuntu上取消了gmake（GNUmake），用make代替即可" class="headerlink" title="无gmake的情况：ubuntu上取消了gmake（GNUmake），用make代替即可"></a>无gmake的情况：ubuntu上取消了gmake（GNUmake），用make代替即可</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">ln</span> -s /usr/bin/make /usr/bin/gmake</span><br></pre></td></tr></table></figure>
+
+    </article>
+    <!-- license -->
+    
+    <!-- paginator -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a href="/2022/09/02/hello-world/" title="Hello World">
+                    <div class="nextTitle">Hello World</div>
+                </a>
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2022/03/28/Ubuntu-20-04%E4%B8%8B-netcdf%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85/" title="Ubuntu 20.04下 netcdf库的安装">
+                    <div class="prevTitle">Ubuntu 20.04下 netcdf库的安装</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- comment -->
+    
+        <div class="post-comment">
+            <!-- 来必力 City 版安装代码 -->
+
+
+            
+
+            
+
+            
+
+            <!-- utteranc评论 -->
+
+
+            <!-- partial('_partial/comment/changyan') -->
+            <!--PC版-->
+
+
+            
+            
+
+            
+
+        </div>
+    
+    <!-- timeliness note -->
+    <!-- idea from: https://hexo.fluid-dev.com/posts/hexo-injector/#%E6%96%87%E7%AB%A0%E6%97%B6%E6%95%88%E6%80%A7%E6%8F%90%E7%A4%BA -->
+    
+    <!-- Mathjax -->
+    
+</main>
+
+                <!-- profile -->
+                
+            </div>
+            <footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+        <div class="social">
+            
+    
+        
+            
+                <a href="mailto:1959059596@qq.com" class="iconfont-archer email" title=email ></a>
+            
+        
+    
+        
+            
+                <a href="//https://github.com/HJJ124" class="iconfont-archer github" target="_blank" title=github></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+
+        </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- website approve for Chinese user -->
+    
+        <div class="website-approve">
+            
+            
+        </div>
+    
+    <!-- 不蒜子  -->
+    
+        <div class="busuanzi-container">
+            
+             
+                <span id="busuanzi_container_site_pv">PV: <span id="busuanzi_value_site_pv"></span> :)</span>
+            
+        </div>
+    	
+</footer>
+
+        </div>
+        <!-- toc -->
+        
+            <div class="toc-wrapper toc-wrapper-loding" style=
+
+
+
+
+
+
+
+    top:50vh;
+
+>
+                <div class="toc-catalog">
+                    <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+                </div>
+                <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A3%E6%96%87"><span class="toc-number">2.</span> <span class="toc-text">正文</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#config-machines-xml"><span class="toc-number">2.1.</span> <span class="toc-text">config_machines.xml</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#config-compilers-xml"><span class="toc-number">2.2.</span> <span class="toc-text">config_compilers.xml</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#env-mach-specific-userdefined"><span class="toc-number">2.3.</span> <span class="toc-text">env_mach_specific.userdefined</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#mkbatch-userdefined"><span class="toc-number">2.4.</span> <span class="toc-text">mkbatch.userdefined</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%8C%E6%88%90%E7%A7%BB%E6%A4%8D%EF%BC%8C%E8%BF%9B%E8%A1%8C%E6%B5%8B%E8%AF%95%E3%80%82"><span class="toc-number">3.</span> <span class="toc-text">完成移植，进行测试。</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%8B%E8%AF%951"><span class="toc-number">3.1.</span> <span class="toc-text">测试1</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B5%8B%E8%AF%952"><span class="toc-number">3.2.</span> <span class="toc-text">测试2</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%88%86%E8%BE%A8%E7%8E%87%E4%B8%BA10-amp-deg-x15-amp-deg-%EF%BC%8C%E5%8F%AA%E8%BF%90%E8%A1%8C%E5%A4%A7%E6%B0%94%E6%A8%A1%E5%9D%97%E7%9A%84%E8%AF%95%E9%AA%8C"><span class="toc-number">3.2.1.</span> <span class="toc-text">创建一个分辨率为10&amp;deg;x15&amp;deg;，只运行大气模块的试验</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%94%9F%E6%88%90%E6%B5%8B%E8%AF%95%E7%9A%84%E8%AF%95%E8%BF%90%E8%A1%8C%E8%84%9A%E6%9C%AC"><span class="toc-number">3.2.2.</span> <span class="toc-text">生成测试的试运行脚本</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9%E8%BF%90%E8%A1%8C%E8%AE%BE%E7%BD%AE"><span class="toc-number">3.2.3.</span> <span class="toc-text">修改运行设置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E5%B9%B6%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D%E8%BF%90%E8%A1%8C%E7%8A%B6%E6%80%81"><span class="toc-number">3.2.4.</span> <span class="toc-text">运行并查看当前运行状态</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E7%BB%93%E6%9D%9F"><span class="toc-number">3.2.5.</span> <span class="toc-text">运行结束</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B8%A9%E5%9D%91%E8%AE%B0%E5%BD%95"><span class="toc-number">4.</span> <span class="toc-text">踩坑记录</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E6%9E%9C%E5%87%BA%E7%8E%B0-Can%E2%80%99t-locate-Switch-pm-in-INC-%E5%88%99%E6%98%AF%E5%9B%A0%E4%B8%BAPerl5-1%E4%BB%A5%E4%B8%8A%E7%9A%84%E7%89%88%E6%9C%AC%E9%97%AE%E9%A2%98%EF%BC%8C%E5%8F%AA%E9%9C%80%E5%B0%86%E5%B7%B2%E6%9C%89%E7%9A%84Switch-pm-%E6%96%87%E4%BB%B6%E5%A4%8D%E5%88%B6%E5%88%B0INC%E4%B8%AD%E4%B8%80%E4%B8%AA%E8%B7%AF%E5%BE%84%E5%8D%B3%E5%8F%AF"><span class="toc-number">4.1.</span> <span class="toc-text">如果出现 Can’t locate Switch.pm in @INC  则是因为Perl5.1以上的版本问题，只需将已有的Switch.pm 文件复制到INC中一个路径即可</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A0gmake%E7%9A%84%E6%83%85%E5%86%B5%EF%BC%9Aubuntu%E4%B8%8A%E5%8F%96%E6%B6%88%E4%BA%86gmake%EF%BC%88GNUmake%EF%BC%89%EF%BC%8C%E7%94%A8make%E4%BB%A3%E6%9B%BF%E5%8D%B3%E5%8F%AF"><span class="toc-number">4.2.</span> <span class="toc-text">无gmake的情况：ubuntu上取消了gmake（GNUmake），用make代替即可</span></a></li></ol></li></ol>
+            </div>
+        
+        <!-- sidebar -->
+        <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+        <div class="sidebar-panel-archives">
+    <!-- 在 ejs 中将 archive 按照时间排序 -->
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 4
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+        
+            
+            
+            <div class="archive-year"> 2022 </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/02</span>
+            <a class="archive-post-title" href="/2022/09/02/Docker/">Docker 笔记</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/22</span>
+            <a class="archive-post-title" href="/2022/05/22/CESM_1.1/">Ubuntu 20.04 下cesm1.1 的移植与测试</a>
+        </li>
+    
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/28</span>
+            <a class="archive-post-title" href="/2022/03/28/Ubuntu-20-04%E4%B8%8B-netcdf%E5%BA%93%E7%9A%84%E5%AE%89%E8%A3%85/">Ubuntu 20.04下 netcdf库的安装</a>
+        </li>
+    
+        
+            
+            
+                
+                </ul>
+            
+            <div class="archive-year"> Invalid date </div>
+            <ul class="year-list">
+            
+        
+        <li class="archive-post-item">
+            <span class="archive-post-date">Invalid date</span>
+            <a class="archive-post-title" href="/2022/09/02/hello-world/">Hello World</a>
+        </li>
+    
+    </div>
+</div>
+
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+        
+            <span class="sidebar-tag-name" data-tags="Model">
+                <span class="iconfont-archer">&#xe606;</span>
+                Model
+            </span>
+        
+            <span class="sidebar-tag-name" data-tags="Software">
+                <span class="iconfont-archer">&#xe606;</span>
+                Software
+            </span>
+        
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+        缺失模块，请参考主题文档进行安装配置：https://github.com/fi3ework/hexo-theme-archer#%E5%AE%89%E8%A3%85%E4%B8%BB%E9%A2%98
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Linux">
+            <span class="iconfont-archer">&#xe60a;</span>
+            Linux
+        </span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+
+    </div>
+</div>
+
+        <!-- site-meta -->
+        <script>
+    var siteMetaRoot = "/"
+    if (siteMetaRoot === "undefined") {
+        siteMetaRoot = '/'
+    }
+    var siteMeta = {
+        url: "https://ihjj.cn",
+        root: siteMetaRoot,
+        author: "Junjie Huang"
+    }
+</script>
+
+        <!-- import experimental options here -->
+        <!-- Custom Font -->
+
+
+        <!-- main func -->
+        <script src="/scripts/main.js?v=20211217"></script>
+        <!-- dark mode -->
+        <script src="/scripts/dark.js?v=20211217"></script>
+        <!-- fancybox -->
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" defer></script>
+        <!-- algolia -->
+        
+        <!-- busuanzi -->
+        
+            <script src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async></script>
+        
+        <!-- CNZZ -->
+        
+        <!-- async load share.js -->
+        
+            <script src="/scripts/share.js?v=20211217" async></script>
+        
+        <!-- mermaid -->
+        
+            <script src='https://cdn.jsdelivr.net/npm/mermaid@8.11.0/dist/mermaid.min.js'></script>
+            <script>
+                if (window.mermaid) {
+                    mermaid.initialize({theme: 'dark'});
+                }
+            </script>
+        
+    </body>
+</html>
